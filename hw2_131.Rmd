@@ -22,11 +22,7 @@ tidymodels_prefer()
 ## Question 1 
 ```{r}
 # read the dataset into a data frame
-abalone <- read.csv("http://archive.ics.uci.edu/ml/machine-learning-databases/abalone/abalone.data", header=FALSE)
-
-# add column names
-names(abalone) <- c("sex", "length", "diameter", "height", "weight.whole",
-    "weight.shucked", "weight.viscera", "weight.shell", "rings")
+abalone <- read.csv("~/Downloads/homework-2/data/abalone.csv", header = TRUE)
 
 #add age variable
 abalone$age <- abalone$rings + 1.5

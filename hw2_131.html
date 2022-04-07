@@ -393,7 +393,7 @@ library(tidyverse)</code></pre>
 ## x dplyr::lag()      masks stats::lag()
 ## x yardstick::spec() masks readr::spec()
 ## x recipes::step()   masks stats::step()
-## • Use suppressPackageStartupMessages() to eliminate package startup messages</code></pre>
+## • Use tidymodels_prefer() to resolve common conflicts.</code></pre>
 <pre class="r"><code>library(corrplot)</code></pre>
 <pre><code>## corrplot 0.92 loaded</code></pre>
 <pre class="r"><code>library(ggthemes)
@@ -401,11 +401,7 @@ tidymodels_prefer()</code></pre>
 <div id="question-1" class="section level2">
 <h2>Question 1</h2>
 <pre class="r"><code># read the dataset into a data frame
-abalone &lt;- read.csv(&quot;http://archive.ics.uci.edu/ml/machine-learning-databases/abalone/abalone.data&quot;, header=FALSE)
-
-# add column names
-names(abalone) &lt;- c(&quot;sex&quot;, &quot;length&quot;, &quot;diameter&quot;, &quot;height&quot;, &quot;weight.whole&quot;,
-    &quot;weight.shucked&quot;, &quot;weight.viscera&quot;, &quot;weight.shell&quot;, &quot;rings&quot;)
+abalone &lt;- read.csv(&quot;~/Downloads/homework-2/data/abalone.csv&quot;, header = TRUE)
 
 #add age variable
 abalone$age &lt;- abalone$rings + 1.5
