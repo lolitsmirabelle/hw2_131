@@ -1,0 +1,38 @@
+---
+title: "hw2_131"
+output: html_document
+date: '2022-04-07'
+---
+
+# Homework 2
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ggplot2)
+library(tidyverse)
+library(tidymodels)
+library(corrplot)
+library(ggthemes)
+tidymodels_prefer()
+```
+
+
+## Question 1 
+```{r}
+# read the dataset into a data frame
+abalone <- read.csv("http://archive.ics.uci.edu/ml/machine-learning-databases/abalone/abalone.data", header=FALSE)
+
+# add column names
+names(abalone) <- c("sex", "length", "diameter", "height", "weight.whole",
+    "weight.shucked", "weight.viscera", "weight.shell", "rings")
+
+#add age variable
+abalone$age <- abalone$rings + 1.5
+
+
+```
+
+
