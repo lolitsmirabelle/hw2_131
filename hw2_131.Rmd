@@ -32,7 +32,10 @@ names(abalone) <- c("sex", "length", "diameter", "height", "weight.whole",
 #add age variable
 abalone$age <- abalone$rings + 1.5
 
-
+abalone %>% 
+  ggplot(aes(x = age)) +
+  geom_histogram(bins = 60) +
+  theme_bw()
 ```
 
-
+The distribution of age is skewed to the right.
