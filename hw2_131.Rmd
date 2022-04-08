@@ -48,11 +48,41 @@ abalone_test <- testing(abalone_split)
 
 ## Question 3 
 ```{r}
-simple_abalone_recipe <-
-  recipe(age ~ ., data = abalone_train)
+abalone_recipe <- 
+  recipe(age ~ ., data = abalone_train) %>% 
+  step_dummy(all_nominal_predictors()) %>%
+  step_corr(all_predictors()) %>%
+  step_interact(terms = ~ type:shucked_weight) %>%
+  step_interact(terms = ~ longest_shell:diameter) %>%
+  step_interact(terms = ~ shucked_weight:shell_weight) %>%
+  step_center(all_predictors(), -all_outcomes()) %>%
+  step_scale(all_predictors(), -all_outcomes())
+```
 
-abalone_recipe <- recipe(age ~ ., data = abalone_train) %>% 
-  step_dummy(all_nominal_predictors())
+
+## Question 4
+```{r}
+lm_model <- linear_reg() %>% 
+  set_engine("lm")
+```
+
+
+## Question 5
+```{r}
+lm_wflow <- workflow() %>% 
+  add_model(lm_model) %>% 
+  add_recipe(abalone_recipe)
+```
+
+
+## Question 6 
+```{r}
+
+```
+
+
+## Question 7
+```{r}
 
 ```
 

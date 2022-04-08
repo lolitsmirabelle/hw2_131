@@ -393,7 +393,7 @@ library(tidyverse)</code></pre>
 ## x dplyr::lag()      masks stats::lag()
 ## x yardstick::spec() masks readr::spec()
 ## x recipes::step()   masks stats::step()
-## • Use suppressPackageStartupMessages() to eliminate package startup messages</code></pre>
+## • Learn how to get started at https://www.tidymodels.org/start/</code></pre>
 <pre class="r"><code>library(corrplot)</code></pre>
 <pre><code>## corrplot 0.92 loaded</code></pre>
 <pre class="r"><code>library(ggthemes)
@@ -424,11 +424,32 @@ abalone_test &lt;- testing(abalone_split)</code></pre>
 </div>
 <div id="question-3" class="section level2">
 <h2>Question 3</h2>
-<pre class="r"><code>simple_abalone_recipe &lt;-
-  recipe(age ~ ., data = abalone_train)
-
-abalone_recipe &lt;- recipe(age ~ ., data = abalone_train) %&gt;% 
-  step_dummy(all_nominal_predictors())</code></pre>
+<pre class="r"><code>abalone_recipe &lt;- 
+  recipe(age ~ ., data = abalone_train) %&gt;% 
+  step_dummy(all_nominal_predictors()) %&gt;%
+  step_corr(all_predictors()) %&gt;%
+  step_interact(terms = ~ type:shucked_weight) %&gt;%
+  step_interact(terms = ~ longest_shell:diameter) %&gt;%
+  step_interact(terms = ~ shucked_weight:shell_weight) %&gt;%
+  step_center(all_predictors(), -all_outcomes()) %&gt;%
+  step_scale(all_predictors(), -all_outcomes())</code></pre>
+</div>
+<div id="question-4" class="section level2">
+<h2>Question 4</h2>
+<pre class="r"><code>lm_model &lt;- linear_reg() %&gt;% 
+  set_engine(&quot;lm&quot;)</code></pre>
+</div>
+<div id="question-5" class="section level2">
+<h2>Question 5</h2>
+<pre class="r"><code>lm_wflow &lt;- workflow() %&gt;% 
+  add_model(lm_model) %&gt;% 
+  add_recipe(abalone_recipe)</code></pre>
+</div>
+<div id="question-6" class="section level2">
+<h2>Question 6</h2>
+</div>
+<div id="question-7" class="section level2">
+<h2>Question 7</h2>
 </div>
 
 
