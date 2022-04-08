@@ -393,7 +393,7 @@ library(tidyverse)</code></pre>
 ## x dplyr::lag()      masks stats::lag()
 ## x yardstick::spec() masks readr::spec()
 ## x recipes::step()   masks stats::step()
-## • Use tidymodels_prefer() to resolve common conflicts.</code></pre>
+## • Use suppressPackageStartupMessages() to eliminate package startup messages</code></pre>
 <pre class="r"><code>library(corrplot)</code></pre>
 <pre><code>## corrplot 0.92 loaded</code></pre>
 <pre class="r"><code>library(ggthemes)
@@ -415,6 +415,20 @@ abalone %&gt;%
 </div>
 <div id="question-2" class="section level2">
 <h2>Question 2</h2>
+<pre class="r"><code>set.seed(2424)
+
+abalone_split &lt;- initial_split(abalone, prop = 0.80,
+                                strata = age)
+abalone_train &lt;- training(abalone_split)
+abalone_test &lt;- testing(abalone_split)</code></pre>
+</div>
+<div id="question-3" class="section level2">
+<h2>Question 3</h2>
+<pre class="r"><code>simple_abalone_recipe &lt;-
+  recipe(age ~ ., data = abalone_train)
+
+abalone_recipe &lt;- recipe(age ~ ., data = abalone_train) %&gt;% 
+  step_dummy(all_nominal_predictors())</code></pre>
 </div>
 
 

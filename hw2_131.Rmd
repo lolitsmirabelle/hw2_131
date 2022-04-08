@@ -37,3 +37,22 @@ The distribution of age is skewed to the right.
 
 
 ## Question 2
+```{r}
+set.seed(2424)
+
+abalone_split <- initial_split(abalone, prop = 0.80,
+                                strata = age)
+abalone_train <- training(abalone_split)
+abalone_test <- testing(abalone_split)
+```
+
+## Question 3 
+```{r}
+simple_abalone_recipe <-
+  recipe(age ~ ., data = abalone_train)
+
+abalone_recipe <- recipe(age ~ ., data = abalone_train) %>% 
+  step_dummy(all_nominal_predictors())
+
+```
+
