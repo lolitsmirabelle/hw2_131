@@ -49,14 +49,11 @@ abalone_test <- testing(abalone_split)
 ## Question 3 
 ```{r}
 abalone_recipe <- 
-  recipe(age ~ ., data = abalone_train) %>% 
+  recipe(age ~ ., data = abalone_train%>%select(-rings)) %>% 
   step_dummy(all_nominal_predictors()) %>%
-  step_corr(all_predictors()) %>%
-  step_interact(terms = ~ type:shucked_weight) %>%
-  step_interact(terms = ~ longest_shell:diameter) %>%
-  step_interact(terms = ~ shucked_weight:shell_weight) %>%
-  step_center(all_predictors(), -all_outcomes()) %>%
-  step_scale(all_predictors(), -all_outcomes())
+  step_interact(terms = ~ starts_with("type"):shucked_weight +longest_shell:diameter + shucked_weight:shell_weight) %>%
+  step_center(all_predictors()) %>%
+  step_scale(all_predictors())
 ```
 
 
@@ -77,12 +74,36 @@ lm_wflow <- workflow() %>%
 
 ## Question 6 
 ```{r}
+longest_shell <- c(0.50)
+diameter <- c(0.10)
+height <- c(0.30)
+whole_weight <- c(4)
+shucked_weight <- c(1) 
+viscera_weight <- c(2) 
+shell_weight <- c(1)
+type <- c("F")
 
+df = data.frame(longest_shell, diameter, height, whole_weight, shucked_weight, viscera_weight, shell_weight, type, stringsAsFactors = TRUE)
+
+lm_fit <- fit(lm_wflow, abalone_train%>%select(-rings))
+
+pred <- predict(lm_fit, new_data = df)
+pred
 ```
 
 
 ## Question 7
 ```{r}
+abalone_train_res <- predict(lm_fit, new_data = abalone_train %>% select(-age))
+abalone_train_res %>% 
+  head()
 
+abalone_train_res <- bind_cols(abalone_train_res, abalone_train %>% select(age))
+abalone_train_res %>% 
+  head()
+
+abalone_metrics <- metric_set(rmse, rsq, mae)
+abalone_metrics(abalone_train_res, truth = age, 
+                estimate = .pred)
 ```
-
+The R-squared value I got was 0.5674645. This reveals that around 56.75% of the data fit the regression model. The higher an R-squared value is, the better fit the model.

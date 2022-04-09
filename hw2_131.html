@@ -393,7 +393,7 @@ library(tidyverse)</code></pre>
 ## x dplyr::lag()      masks stats::lag()
 ## x yardstick::spec() masks readr::spec()
 ## x recipes::step()   masks stats::step()
-## • Learn how to get started at https://www.tidymodels.org/start/</code></pre>
+## • Dig deeper into tidy modeling with R at https://www.tmwr.org</code></pre>
 <pre class="r"><code>library(corrplot)</code></pre>
 <pre><code>## corrplot 0.92 loaded</code></pre>
 <pre class="r"><code>library(ggthemes)
@@ -425,14 +425,11 @@ abalone_test &lt;- testing(abalone_split)</code></pre>
 <div id="question-3" class="section level2">
 <h2>Question 3</h2>
 <pre class="r"><code>abalone_recipe &lt;- 
-  recipe(age ~ ., data = abalone_train) %&gt;% 
+  recipe(age ~ ., data = abalone_train%&gt;%select(-rings)) %&gt;% 
   step_dummy(all_nominal_predictors()) %&gt;%
-  step_corr(all_predictors()) %&gt;%
-  step_interact(terms = ~ type:shucked_weight) %&gt;%
-  step_interact(terms = ~ longest_shell:diameter) %&gt;%
-  step_interact(terms = ~ shucked_weight:shell_weight) %&gt;%
-  step_center(all_predictors(), -all_outcomes()) %&gt;%
-  step_scale(all_predictors(), -all_outcomes())</code></pre>
+  step_interact(terms = ~ starts_with(&quot;type&quot;):shucked_weight +longest_shell:diameter + shucked_weight:shell_weight) %&gt;%
+  step_center(all_predictors()) %&gt;%
+  step_scale(all_predictors())</code></pre>
 </div>
 <div id="question-4" class="section level2">
 <h2>Question 4</h2>
@@ -447,9 +444,64 @@ abalone_test &lt;- testing(abalone_split)</code></pre>
 </div>
 <div id="question-6" class="section level2">
 <h2>Question 6</h2>
+<pre class="r"><code>longest_shell &lt;- c(0.50)
+diameter &lt;- c(0.10)
+height &lt;- c(0.30)
+whole_weight &lt;- c(4)
+shucked_weight &lt;- c(1) 
+viscera_weight &lt;- c(2) 
+shell_weight &lt;- c(1)
+type &lt;- c(&quot;F&quot;)
+
+df = data.frame(longest_shell, diameter, height, whole_weight, shucked_weight, viscera_weight, shell_weight, type, stringsAsFactors = TRUE)
+
+lm_fit &lt;- fit(lm_wflow, abalone_train%&gt;%select(-rings))
+
+pred &lt;- predict(lm_fit, new_data = df)
+pred</code></pre>
+<pre><code>## # A tibble: 1 × 1
+##   .pred
+##   &lt;dbl&gt;
+## 1  21.8</code></pre>
 </div>
 <div id="question-7" class="section level2">
 <h2>Question 7</h2>
+<pre class="r"><code>abalone_train_res &lt;- predict(lm_fit, new_data = abalone_train %&gt;% select(-age))
+abalone_train_res %&gt;% 
+  head()</code></pre>
+<pre><code>## # A tibble: 6 × 1
+##   .pred
+##   &lt;dbl&gt;
+## 1  9.44
+## 2 10.2 
+## 3  9.90
+## 4  5.82
+## 5  8.55
+## 6 11.8</code></pre>
+<pre class="r"><code>abalone_train_res &lt;- bind_cols(abalone_train_res, abalone_train %&gt;% select(age))
+abalone_train_res %&gt;% 
+  head()</code></pre>
+<pre><code>## # A tibble: 6 × 2
+##   .pred   age
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1  9.44   8.5
+## 2 10.2    8.5
+## 3  9.90   9.5
+## 4  5.82   6.5
+## 5  8.55   8.5
+## 6 11.8    8.5</code></pre>
+<pre class="r"><code>abalone_metrics &lt;- metric_set(rmse, rsq, mae)
+abalone_metrics(abalone_train_res, truth = age, 
+                estimate = .pred)</code></pre>
+<pre><code>## # A tibble: 3 × 3
+##   .metric .estimator .estimate
+##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+## 1 rmse    standard       2.13 
+## 2 rsq     standard       0.567
+## 3 mae     standard       1.53</code></pre>
+<p>The R-squared value I got was 0.5674645. This reveals that around
+56.75% of the data fit the regression model. The higher an R-squared
+value is, the better fit the model.</p>
 </div>
 
 
