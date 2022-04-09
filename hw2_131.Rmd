@@ -42,12 +42,14 @@ set.seed(2424)
 
 abalone_split <- initial_split(abalone, prop = 0.80,
                                 strata = age)
-abalone_train <- training(abalone_split)
+abalone_train <- training(abalone_split) # split abalone data into training & testing set
 abalone_test <- testing(abalone_split)
 ```
 
 ## Question 3 
 ```{r}
+# create a recipe predicting the outcome variable, age, with all other predictor variables except rings
+
 abalone_recipe <- 
   recipe(age ~ ., data = abalone_train%>%select(-rings)) %>% 
   step_dummy(all_nominal_predictors()) %>%
@@ -55,10 +57,11 @@ abalone_recipe <-
   step_center(all_predictors()) %>%
   step_scale(all_predictors())
 ```
-
+Rings should not be included to predict age because we've already denoted that age = rings + 1.5.
 
 ## Question 4
 ```{r}
+# create and store a linear regression object using the "lm" engine.
 lm_model <- linear_reg() %>% 
   set_engine("lm")
 ```
@@ -66,6 +69,7 @@ lm_model <- linear_reg() %>%
 
 ## Question 5
 ```{r}
+# set up an empty workflow, add the model you created in Question 4, and add the recipe that you created in Question 3.
 lm_wflow <- workflow() %>% 
   add_model(lm_model) %>% 
   add_recipe(abalone_recipe)
@@ -85,6 +89,8 @@ type <- c("F")
 
 df = data.frame(longest_shell, diameter, height, whole_weight, shucked_weight, viscera_weight, shell_weight, type, stringsAsFactors = TRUE)
 
+# Use fit() object to predict the age of a hypothetical female abalone with longest_shell = 0.50, diameter = 0.10, height = 0.30, whole_weight = 4, shucked_weight = 1, viscera_weight = 2, shell_weight = 1.
+
 lm_fit <- fit(lm_wflow, abalone_train%>%select(-rings))
 
 pred <- predict(lm_fit, new_data = df)
@@ -94,6 +100,8 @@ pred
 
 ## Question 7
 ```{r}
+# Use predict() and bind_cols() to create a tibble of model’s predicted values from the training data along with the actual observed ages
+
 abalone_train_res <- predict(lm_fit, new_data = abalone_train %>% select(-age))
 abalone_train_res %>% 
   head()
@@ -102,6 +110,7 @@ abalone_train_res <- bind_cols(abalone_train_res, abalone_train %>% select(age))
 abalone_train_res %>% 
   head()
 
+# Create a metric set that includes R2, RMSE (root mean squared error), and MAE (mean absolute error).
 abalone_metrics <- metric_set(rmse, rsq, mae)
 abalone_metrics(abalone_train_res, truth = age, 
                 estimate = .pred)

@@ -419,26 +419,32 @@ abalone %&gt;%
 
 abalone_split &lt;- initial_split(abalone, prop = 0.80,
                                 strata = age)
-abalone_train &lt;- training(abalone_split)
+abalone_train &lt;- training(abalone_split) # split abalone data into training &amp; testing set
 abalone_test &lt;- testing(abalone_split)</code></pre>
 </div>
 <div id="question-3" class="section level2">
 <h2>Question 3</h2>
-<pre class="r"><code>abalone_recipe &lt;- 
+<pre class="r"><code># create a recipe predicting the outcome variable, age, with all other predictor variables except rings
+
+abalone_recipe &lt;- 
   recipe(age ~ ., data = abalone_train%&gt;%select(-rings)) %&gt;% 
   step_dummy(all_nominal_predictors()) %&gt;%
   step_interact(terms = ~ starts_with(&quot;type&quot;):shucked_weight +longest_shell:diameter + shucked_weight:shell_weight) %&gt;%
   step_center(all_predictors()) %&gt;%
   step_scale(all_predictors())</code></pre>
+<p>Rings should not be included to predict age because we’ve already
+denoted that age = rings + 1.5.</p>
 </div>
 <div id="question-4" class="section level2">
 <h2>Question 4</h2>
-<pre class="r"><code>lm_model &lt;- linear_reg() %&gt;% 
+<pre class="r"><code># create and store a linear regression object using the &quot;lm&quot; engine.
+lm_model &lt;- linear_reg() %&gt;% 
   set_engine(&quot;lm&quot;)</code></pre>
 </div>
 <div id="question-5" class="section level2">
 <h2>Question 5</h2>
-<pre class="r"><code>lm_wflow &lt;- workflow() %&gt;% 
+<pre class="r"><code># set up an empty workflow, add the model you created in Question 4, and add the recipe that you created in Question 3.
+lm_wflow &lt;- workflow() %&gt;% 
   add_model(lm_model) %&gt;% 
   add_recipe(abalone_recipe)</code></pre>
 </div>
@@ -455,6 +461,8 @@ type &lt;- c(&quot;F&quot;)
 
 df = data.frame(longest_shell, diameter, height, whole_weight, shucked_weight, viscera_weight, shell_weight, type, stringsAsFactors = TRUE)
 
+# Use fit() object to predict the age of a hypothetical female abalone with longest_shell = 0.50, diameter = 0.10, height = 0.30, whole_weight = 4, shucked_weight = 1, viscera_weight = 2, shell_weight = 1.
+
 lm_fit &lt;- fit(lm_wflow, abalone_train%&gt;%select(-rings))
 
 pred &lt;- predict(lm_fit, new_data = df)
@@ -466,7 +474,9 @@ pred</code></pre>
 </div>
 <div id="question-7" class="section level2">
 <h2>Question 7</h2>
-<pre class="r"><code>abalone_train_res &lt;- predict(lm_fit, new_data = abalone_train %&gt;% select(-age))
+<pre class="r"><code># Use predict() and bind_cols() to create a tibble of model’s predicted values from the training data along with the actual observed ages
+
+abalone_train_res &lt;- predict(lm_fit, new_data = abalone_train %&gt;% select(-age))
 abalone_train_res %&gt;% 
   head()</code></pre>
 <pre><code>## # A tibble: 6 × 1
@@ -490,7 +500,8 @@ abalone_train_res %&gt;%
 ## 4  5.82   6.5
 ## 5  8.55   8.5
 ## 6 11.8    8.5</code></pre>
-<pre class="r"><code>abalone_metrics &lt;- metric_set(rmse, rsq, mae)
+<pre class="r"><code># Create a metric set that includes R2, RMSE (root mean squared error), and MAE (mean absolute error).
+abalone_metrics &lt;- metric_set(rmse, rsq, mae)
 abalone_metrics(abalone_train_res, truth = age, 
                 estimate = .pred)</code></pre>
 <pre><code>## # A tibble: 3 × 3
